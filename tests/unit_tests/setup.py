@@ -6,6 +6,7 @@ class ClientMixin:
     @classmethod
     def setUpClass(cls):
         super(ClientMixin, cls).setUpClass()
+        app.config['TESTING'] = True
         cls.client = app.test_client()
 
 

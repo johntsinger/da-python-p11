@@ -80,3 +80,19 @@ class TestPurchasePlaces(BaseTestCase):
             b'You do not have enough points.',
             response.data
         )
+
+    def test_post_without_data(self):
+        data = {
+            'club': self.club['name'],
+            'competition': self.competition['name'],
+            'places': ''
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'You must enter a positive number of places to book them.',
+            response.data
+        )

@@ -144,3 +144,27 @@ class TestPurchasePlaces(BaseTestCase):
             self.competition['numberOfPlaces'],
             self.initial_competition_places
         )
+
+    def test_purchase_more_than_12_places(self):
+        data = {
+            'club': self.club['name'],
+            'competition': self.competition['name'],
+            'places': '13'
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'You can not book more than 12 places per competition.',
+            response.data
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )
+        self.assertEqual(
+            self.competition['numberOfPlaces'],
+            self.initial_competition_places
+        )

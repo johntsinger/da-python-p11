@@ -52,7 +52,7 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     error = None
-    if not request.form['places']:
+    if not request.form['places'] or int(request.form['places']) <= 0:
         error = 'You must enter a positive number of places to book them.'
     else:
         placesRequired = int(request.form['places'])

@@ -41,7 +41,15 @@ def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club][0]
     foundCompetition = [c for c in competitions if c['name'] == competition][0]
     if foundClub and foundCompetition:
-        return render_template('booking.html',club=foundClub,competition=foundCompetition)
+        return render_template(
+            'booking.html',
+            club=foundClub,
+            competition=foundCompetition,
+            minimun_booking=min(
+                int(foundClub['points']),
+                12
+            )
+        )
     else:
         flash("Something went wrong-please try again")
         return render_template('welcome.html', club=club, competitions=competitions)
@@ -58,12 +66,18 @@ def purchasePlaces():
         placesRequired = int(request.form['places'])
         if placesRequired > int(club['points']):
             error = 'You do not have enough points.'
+        elif placesRequired > 12:
+            error = 'You can not book more than 12 places per competition.'
     if error:
         return render_template(
             'booking.html',
             club=club,
             competition=competition,
-            error=error
+            error=error,
+            minimun_booking=min(
+                int(club['points']),
+                12
+            )
         ), 400
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     club['points'] = int(club['points']) - placesRequired

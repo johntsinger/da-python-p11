@@ -40,7 +40,7 @@ class BaseTestCase(ClientMixin, TestCase):
         {
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": "5"
         }
     ]
     server.add_places_booked_field_to_competition(competitions, clubs)

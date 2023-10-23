@@ -239,3 +239,61 @@ class TestPurchasePlaces(BaseTestCase):
             self.competition['numberOfPlaces'],
             self.initial_competition_places - self.MAXIMUM_BOOKING_PER_CLUB
         )
+
+    def test_purchase_more_places_than_competition_has_available(self):
+        competition = self.competitions[1]
+        initial_competition_places = int(competition['numberOfPlaces'])
+        data = {
+            'club': self.club['name'],
+            'competition': competition['name'],
+            'places': self.MAXIMUM_BOOKING_PER_CLUB
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            (
+                f'You try to purchase {data["places"]} places but there '
+                f'are only {competition["numberOfPlaces"]} left for '
+                'this competition.'
+            ).encode('utf-8'),
+            response.data
+        )
+        self.assertTrue(int(competition['numberOfPlaces']) > 0)
+        self.assertEqual(
+            int(competition['numberOfPlaces']),
+            initial_competition_places
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )
+
+    def test_purchase_places_when_competition_is_full(self):
+        competition = self.competitions[1]
+        competition['numberOfPlaces'] = 0
+        initial_competition_places = int(competition['numberOfPlaces'])
+        data = {
+            'club': self.club['name'],
+            'competition': competition['name'],
+            'places': self.MAXIMUM_BOOKING_PER_CLUB
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'This competition is full',
+            response.data
+        )
+        self.assertEqual(
+            int(competition['numberOfPlaces']),
+            initial_competition_places
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )

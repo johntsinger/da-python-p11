@@ -2,6 +2,9 @@ import json
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
+MAXIMUM_BOOKING_PER_CLUB = 12
+
+
 def loadClubs():
     with open('clubs.json') as c:
          listOfClubs = json.load(c)['clubs']
@@ -14,11 +17,24 @@ def loadCompetitions():
          return listOfCompetitions
 
 
+def add_places_booked_field_to_competition(competitions, clubs):
+    """Add 'places_booked' field in competitions to
+    keep track of clubs booking history
+    """
+    for competition in competitions:
+        if not competition.get('places_booked', None):
+            competition['places_booked'] = {
+                club['name']: 0 for club in clubs
+            }
+
+
 app = Flask(__name__)
 app.secret_key = 'something_special'
 
 competitions = loadCompetitions()
 clubs = loadClubs()
+add_places_booked_field_to_competition(competitions, clubs)
+
 
 @app.route('/')
 def index():
@@ -40,14 +56,17 @@ def showSummary():
 def book(competition,club):
     foundClub = [c for c in clubs if c['name'] == club][0]
     foundCompetition = [c for c in competitions if c['name'] == competition][0]
+    places_booked = foundCompetition['places_booked'][foundClub['name']]
     if foundClub and foundCompetition:
         return render_template(
             'booking.html',
             club=foundClub,
             competition=foundCompetition,
-            minimun_booking=min(
+            max_booking_per_club=MAXIMUM_BOOKING_PER_CLUB,
+            places_booked=places_booked,
+            maximum_booking=min(
                 int(foundClub['points']),
-                12
+                MAXIMUM_BOOKING_PER_CLUB - places_booked
             )
         )
     else:
@@ -60,27 +79,49 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     error = None
+    places_booked = competition['places_booked'][club['name']]
     if not request.form['places'] or int(request.form['places']) <= 0:
         error = 'You must enter a positive number of places to book them.'
     else:
         placesRequired = int(request.form['places'])
         if placesRequired > int(club['points']):
             error = 'You do not have enough points.'
-        elif placesRequired > 12:
-            error = 'You can not book more than 12 places per competition.'
+        elif placesRequired > MAXIMUM_BOOKING_PER_CLUB:
+            error = (
+                f'You can not book more than {MAXIMUM_BOOKING_PER_CLUB}'
+                ' places per competition.'
+            )
+
+        elif places_booked == MAXIMUM_BOOKING_PER_CLUB:
+            error = (
+                'You have already reached the maximum'
+                ' number of places for this competition'
+            )
+
+        elif (places_booked + placesRequired) > MAXIMUM_BOOKING_PER_CLUB:
+            error = (
+                'You can purchases no more than '
+                f'{MAXIMUM_BOOKING_PER_CLUB - places_booked} places'
+                ' as your club has already purchased'
+                f' {places_booked} of them'
+            )
+
     if error:
         return render_template(
             'booking.html',
             club=club,
             competition=competition,
             error=error,
-            minimun_booking=min(
+            max_booking_per_club=MAXIMUM_BOOKING_PER_CLUB,
+            places_booked=places_booked,
+            maximum_booking=min(
                 int(club['points']),
-                12
+                MAXIMUM_BOOKING_PER_CLUB - places_booked,
             )
         ), 400
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     club['points'] = int(club['points']) - placesRequired
+    competition['places_booked'][club['name']] += placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
 

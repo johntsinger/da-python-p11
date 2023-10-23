@@ -12,6 +12,8 @@
         <p style="color: red;">You already have purchase {{ max_booking_per_club }} places in this competition.</p>
     {% elif club['points'] == 0 %}
         <p style='color: red;'>Your points balance is insufficient to book places in this competition</p>
+    {% elif competition['numberOfPlaces'] == 0 %}
+        <p style='color: red;'>This competition is full</p>
     {% else %}
     <p>Each club can purchase a maximum of {{ max_booking_per_club }} places per competion :</p>
     <ul>

@@ -66,6 +66,7 @@ def book(competition,club):
             places_booked=places_booked,
             maximum_booking=min(
                 int(foundClub['points']),
+                int(foundCompetition['numberOfPlaces']),
                 MAXIMUM_BOOKING_PER_CLUB - places_booked
             )
         )
@@ -91,13 +92,19 @@ def purchasePlaces():
                 f'You can not book more than {MAXIMUM_BOOKING_PER_CLUB}'
                 ' places per competition.'
             )
-
         elif places_booked == MAXIMUM_BOOKING_PER_CLUB:
             error = (
                 'You have already reached the maximum'
                 ' number of places for this competition'
             )
-
+        elif int(competition['numberOfPlaces']) == 0:
+            error = 'This competition is full'
+        elif placesRequired > int(competition['numberOfPlaces']):
+            error = (
+                f'You try to purchase {placesRequired} places but there '
+                f'are only {competition["numberOfPlaces"]} left for '
+                'this competition.'
+            )
         elif (places_booked + placesRequired) > MAXIMUM_BOOKING_PER_CLUB:
             error = (
                 'You can purchases no more than '
@@ -116,6 +123,7 @@ def purchasePlaces():
             places_booked=places_booked,
             maximum_booking=min(
                 int(club['points']),
+                int(competition['numberOfPlaces']),
                 MAXIMUM_BOOKING_PER_CLUB - places_booked,
             )
         ), 400

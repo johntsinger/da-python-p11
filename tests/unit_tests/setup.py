@@ -13,6 +13,7 @@ class ClientMixin:
 
 
 class BaseTestCase(ClientMixin, TestCase):
+    MAXIMUM_BOOKING_PER_CLUB = server.MAXIMUM_BOOKING_PER_CLUB
     clubs = [
         {
             "name": "Simply Lift",
@@ -42,3 +43,4 @@ class BaseTestCase(ClientMixin, TestCase):
             "numberOfPlaces": "13"
         }
     ]
+    server.add_places_booked_field_to_competition(competitions, clubs)

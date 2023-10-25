@@ -34,13 +34,19 @@ class BaseTestCase(ClientMixin, TestCase):
     competitions = [
         {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
+            "date": "2024-03-27 10:00:00",
             "numberOfPlaces": "25"
         },
         {
             "name": "Fall Classic",
-            "date": "2020-10-22 13:30:00",
+            "date": "2024-10-22 13:30:00",
             "numberOfPlaces": "5"
+        },
+        {
+            "name": "Past Comp",
+            "date": "2020-10-22 13:30:00",
+            "numberOfPlaces": "7"
         }
+
     ]
-    server.add_places_booked_field_to_competition(competitions, clubs)
+    server.add_extra_fields_to_competition(competitions, clubs)

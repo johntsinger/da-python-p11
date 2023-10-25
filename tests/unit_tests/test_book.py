@@ -39,3 +39,19 @@ class TestBook(BaseTestCase):
             b"Something went wrong-please try again",
             response.data
         )
+
+    def test_access_past_competition(self):
+        response = self.client.get(
+            self.get_url(self.past_competition, self.club),
+        )
+        self.assertIn(
+            (
+                "You can not book places in a "
+                "competition that has already taken place"
+            ).encode('utf-8'),
+            response.data
+        )
+        self.assertIn(
+            f"Welcome, {self.club['email']}".encode('utf-8'),
+            response.data
+        )

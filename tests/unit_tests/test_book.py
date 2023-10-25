@@ -7,7 +7,6 @@ class TestBook(BaseTestCase):
         super(TestBook, cls).setUpClass()
         cls.club = cls.clubs[0]
         cls.competition = cls.competitions[0]
-        cls.past_competition = cls.competitions[2]
 
     def get_url(self, competition, club):
         return f"/book/{competition['name']}/{club['name']}"

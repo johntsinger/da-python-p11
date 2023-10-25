@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import Flask,render_template,request,redirect,flash,url_for
 
 
@@ -17,15 +18,23 @@ def loadCompetitions():
          return listOfCompetitions
 
 
-def add_places_booked_field_to_competition(competitions, clubs):
-    """Add 'places_booked' field in competitions to
-    keep track of clubs booking history
+def add_extra_fields_to_competition(competitions, clubs):
+    """Add 'places_booked' and 'is_active' fields in competitions to
+    keep track of clubs booking history and know if competitions is past
     """
+    today = datetime.today()
     for competition in competitions:
         if not competition.get('places_booked', None):
             competition['places_booked'] = {
                 club['name']: 0 for club in clubs
             }
+        if datetime.strptime(
+            competition['date'],
+            '%Y-%m-%d %H:%M:%S'
+        ) < today:
+            competition['is_active'] = False
+        else:
+            competition['is_active'] = True
 
 
 app = Flask(__name__)
@@ -33,7 +42,7 @@ app.secret_key = 'something_special'
 
 competitions = loadCompetitions()
 clubs = loadClubs()
-add_places_booked_field_to_competition(competitions, clubs)
+add_extra_fields_to_competition(competitions, clubs)
 
 
 @app.route('/')
@@ -64,20 +73,29 @@ def book(competition,club):
             club=club,
             competitions=competitions
         ), 400
-    places_booked = foundCompetition['places_booked'][foundClub['name']]
-    if foundClub and foundCompetition:
-        return render_template(
-            'booking.html',
-            club=foundClub,
-            competition=foundCompetition,
-            max_booking_per_club=MAXIMUM_BOOKING_PER_CLUB,
-            places_booked=places_booked,
-            maximum_booking=min(
-                int(foundClub['points']),
-                int(foundCompetition['numberOfPlaces']),
-                MAXIMUM_BOOKING_PER_CLUB - places_booked
-            )
+    if not foundCompetition['is_active']:
+        flash(
+            "You can not book places in a competition"
+            " that has already taken place"
         )
+        return render_template(
+            'welcome.html',
+            club=foundClub,
+            competitions=competitions
+        ), 400
+    places_booked = foundCompetition['places_booked'][foundClub['name']]
+    return render_template(
+        'booking.html',
+        club=foundClub,
+        competition=foundCompetition,
+        max_booking_per_club=MAXIMUM_BOOKING_PER_CLUB,
+        places_booked=places_booked,
+        maximum_booking=min(
+            int(foundClub['points']),
+            int(foundCompetition['numberOfPlaces']),
+            MAXIMUM_BOOKING_PER_CLUB - places_booked
+        )
+    )
 
 
 @app.route('/purchasePlaces',methods=['POST'])

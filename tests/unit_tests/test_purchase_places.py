@@ -297,3 +297,36 @@ class TestPurchasePlaces(BaseTestCase):
             self.club['points'],
             self.initial_club_points
         )
+
+    def test_purchase_places_in_past_competition(self):
+        competition = self.competitions[2]
+        initial_competition_places = int(competition['numberOfPlaces'])
+        data = {
+            'club': self.club['name'],
+            'competition': competition['name'],
+            'places': 1
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            (
+                "You can not book places in a "
+                "competition that has already taken place"
+            ).encode('utf-8'),
+            response.data
+        )
+        self.assertIn(
+            f"Welcome, {self.club['email']}".encode('utf-8'),
+            response.data
+        )
+        self.assertEqual(
+            int(competition['numberOfPlaces']),
+            initial_competition_places
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )

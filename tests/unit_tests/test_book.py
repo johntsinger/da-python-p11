@@ -21,20 +21,26 @@ class TestBook(BaseTestCase):
     def test_wrong_competitons(self):
         competition = {'name': 'Wrong name'}
         response = self.client.get(
-            self.get_url(competition, self.club)
+            self.get_url(competition, self.club),
+            follow_redirects=True
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
         self.assertIn(
             b"Something went wrong-please try again",
+            response.data
+        )
+        self.assertIn(
+            b"Welcome to the GUDLFT Registration Portal!",
             response.data
         )
 
     def test_wrong_club(self):
         club = {'name': 'Wrong name'}
         response = self.client.get(
-            self.get_url(self.competition, club)
+            self.get_url(self.competition, club),
+            follow_redirects=True
         )
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 200)
         self.assertIn(
             b"Something went wrong-please try again",
             response.data

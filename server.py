@@ -68,11 +68,7 @@ def book(competition,club):
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
     except IndexError:
         flash("Something went wrong-please try again")
-        return render_template(
-            'welcome.html',
-            club=club,
-            competitions=competitions
-        ), 400
+        return redirect(url_for('index'))
     if not foundCompetition['is_active']:
         flash(
             "You can not book places in a competition"
@@ -83,19 +79,21 @@ def book(competition,club):
             club=foundClub,
             competitions=competitions
         ), 400
+
     places_booked = foundCompetition['places_booked'][foundClub['name']]
-    return render_template(
-        'booking.html',
-        club=foundClub,
-        competition=foundCompetition,
-        max_booking_per_club=MAXIMUM_BOOKING_PER_CLUB,
-        places_booked=places_booked,
-        maximum_booking=min(
-            int(foundClub['points']),
-            int(foundCompetition['numberOfPlaces']),
-            MAXIMUM_BOOKING_PER_CLUB - places_booked
+    if foundClub and foundCompetition:
+        return render_template(
+            'booking.html',
+            club=foundClub,
+            competition=foundCompetition,
+            max_booking_per_club=MAXIMUM_BOOKING_PER_CLUB,
+            places_booked=places_booked,
+            maximum_booking=min(
+                int(foundClub['points']),
+                int(foundCompetition['numberOfPlaces']),
+                MAXIMUM_BOOKING_PER_CLUB - places_booked
+            )
         )
-    )
 
 
 @app.route('/purchasePlaces',methods=['POST'])

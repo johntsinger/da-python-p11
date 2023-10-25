@@ -148,6 +148,16 @@ def purchasePlaces():
                 MAXIMUM_BOOKING_PER_CLUB - places_booked,
             )
         ), 400
+    if not competition['is_active']:
+        flash(
+            "You can not book places in a competition"
+            " that has already taken place"
+        )
+        return render_template(
+            'welcome.html',
+            club=club,
+            competitions=competitions
+        ), 400
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     club['points'] = int(club['points']) - placesRequired
     competition['places_booked'][club['name']] += placesRequired

@@ -59,11 +59,7 @@ def book(competition,club):
         foundCompetition = [c for c in competitions if c['name'] == competition][0]
     except IndexError:
         flash("Something went wrong-please try again")
-        return render_template(
-            'welcome.html',
-            club=club,
-            competitions=competitions
-        ), 400
+        return redirect(url_for('index'))
     places_booked = foundCompetition['places_booked'][foundClub['name']]
     if foundClub and foundCompetition:
         return render_template(

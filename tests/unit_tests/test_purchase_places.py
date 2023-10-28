@@ -330,3 +330,27 @@ class TestPurchasePlaces(BaseTestCase):
             self.club['points'],
             self.initial_club_points
         )
+
+    def test_purchase_not_a_number(self):
+        data = {
+            'club': self.club['name'],
+            'competition': self.competition['name'],
+            'places': "NaN"
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            b'You must enter a positive number of places to book them.',
+            response.data
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )
+        self.assertEqual(
+            self.competition['numberOfPlaces'],
+            self.initial_competition_places
+        )

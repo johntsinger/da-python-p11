@@ -5,45 +5,44 @@ import server
 class TestLoadClubs(TestCase):
     @classmethod
     def setUpClass(cls):
-        super(TestLoadClubs, cls).setUpClass()
         server.app.config['TESTING'] = True
-        cls.expected_keys = ['name', 'email', 'points']
 
     def test_load_from_json(self):
+        expected_keys = ['name', 'email', 'points']
         results = server.loadClubs()
         self.assertIsInstance(results, list)
+        self.assertTrue(results)
         for elt in results:
             with self.subTest(elt=elt):
                 self.assertIsInstance(elt, dict)
                 self.assertEqual(
                     list(elt.keys()),
-                    self.expected_keys
+                    expected_keys
                 )
 
 
 class TestLoadCompetitions(TestCase):
     @classmethod
     def setUpClass(cls):
-        super(TestLoadCompetitions, cls).setUpClass()
         server.app.config['TESTING'] = True
-        cls.expected_keys = ['name', 'date', 'numberOfPlaces']
 
     def test_load_from_json(self):
+        expected_keys = ['name', 'date', 'numberOfPlaces']
         results = server.loadCompetitions()
         self.assertIsInstance(results, list)
+        self.assertTrue(results)
         for elt in results:
             with self.subTest(elt=elt):
                 self.assertIsInstance(elt, dict)
                 self.assertEqual(
                     list(elt.keys()),
-                    self.expected_keys
+                    expected_keys
                 )
 
 
-class TestAddExtraFieldToCompetition(TestCase):
+class TestAddExtraFieldsToCompetition(TestCase):
     @classmethod
     def setUpClass(cls):
-        super(TestAddExtraFieldToCompetition, cls).setUpClass()
         server.app.config['TESTING'] = True
         cls.clubs = [
             {
@@ -78,21 +77,19 @@ class TestAddExtraFieldToCompetition(TestCase):
             self.competitions,
             self.clubs
         )
-        for elt in self.competitions:
-            with self.subTest(elt=elt):
+        for competition in self.competitions:
+            with self.subTest(competition=competition):
                 self.assertEqual(
-                    list(elt.keys()),
+                    list(competition.keys()),
                     self.expected_keys
                 )
-                self.assertIsInstance(elt['places_booked'], dict)
-                self.assertIsInstance(elt['is_active'], bool)
-                for club in self.clubs:
-                    with self.subTest(club=club):
-                        self.assertIn(
-                            club['name'],
-                            elt['places_booked'].keys()
-                        )
+                self.assertIsInstance(competition['places_booked'], dict)
+                self.assertIsInstance(competition['is_active'], bool)
+                for i, (key, value) in enumerate(
+                    competition['places_booked'].items()
+                ):
+                    with self.subTest(club=self.clubs[i]):
                         self.assertEqual(
-                            elt['places_booked'][club['name']],
-                            0
+                            (key, value),
+                            (self.clubs[i]['name'], 0)
                         )

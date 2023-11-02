@@ -25,14 +25,20 @@ class UserTask(HttpUser):
 
     @task
     def purchase_places(self):
-        self.client.post(
+        """Response will be 400 when there are no more places available
+        in this competition, so we consider 400 to be a success.
+        """
+        with self.client.post(
             '/purchasePlaces',
             {
                 'competition': self.competition['name'],
                 'club': self.club['name'],
                 'places': 1
-            }
-        )
+            },
+            catch_response=True
+        ) as response:
+            if response.status_code == 400:
+                response.success()
 
     @task
     def logout(self):

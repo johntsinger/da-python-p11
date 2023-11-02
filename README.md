@@ -44,8 +44,42 @@
 
 5. Testing
 
-    You are free to use whatever testing framework you like-the main thing is that you can show what tests you are using.
+   Run tests with [unittest](https://docs.python.org/3/library/unittest.html#module-unittest) :
 
-    We also like to show how well we're testing, so there's a module called 
-    [coverage](https://coverage.readthedocs.io/en/coverage-5.1/) you should add to your project.
+       python -m unittest discover tests
 
+   Get tests coverage with [Coverage](https://coverage.readthedocs.io/en/coverage-5.1/) :
+   
+     - Update coverage file :
+    
+           coverage run -m unittest discover tests
+
+       Note : a cover file already exists, but you can update it with this command.
+
+     - Get console report :
+  
+           coverage report
+
+     - Get html report :
+
+           coverage html
+
+   You can find the report in the htmlcov folder by openning the index.html file.
+
+   Run performance tests with [Locust](https://locust.io/):
+
+     - First lauch Flask server :
+
+           flask run
+       
+     - Then open another terminal and activate virtual environement and run Locust :
+
+           locust
+
+     - Then go to http://localhost:8089
+     - Set :
+       - number of users : 1 to 3
+       - spawn rate : 1
+       - host : this should be http://127.0.0.1:5000 if not check the address in the terminal where you are running the flask server
+    - Click start swarming
+    - You must stop the test manually by clicking on the stop button.

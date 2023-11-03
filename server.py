@@ -98,8 +98,12 @@ def book(competition,club):
 
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
-    competition = [c for c in competitions if c['name'] == request.form['competition']][0]
-    club = [c for c in clubs if c['name'] == request.form['club']][0]
+    try:
+        competition = [c for c in competitions if c['name'] == request.form['competition']][0]
+        club = [c for c in clubs if c['name'] == request.form['club']][0]
+    except IndexError:
+        flash("Something went wrong-please try again")
+        return redirect(url_for('index'))
     error = None
     places_booked = competition['places_booked'][club['name']]
     if (

@@ -354,3 +354,61 @@ class TestPurchasePlaces(BaseTestCase):
             self.competition['numberOfPlaces'],
             self.initial_competition_places
         )
+
+    def test_purchase_for_wrong_club(self):
+        data = {
+            'club': 'wrong_club',
+            'competition': self.competition['name'],
+            'places': 5
+        }
+        response = self.client.post(
+            self.url,
+            data=data,
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b"Something went wrong-please try again",
+            response.data
+        )
+        self.assertIn(
+            b"Welcome to the GUDLFT Registration Portal!",
+            response.data
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )
+        self.assertEqual(
+            self.competition['numberOfPlaces'],
+            self.initial_competition_places
+        )
+
+    def test_purchase_for_wrong_competition(self):
+        data = {
+            'club': self.club['name'],
+            'competition': 'wrong_competition',
+            'places': 5
+        }
+        response = self.client.post(
+            self.url,
+            data=data,
+            follow_redirects=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            b"Something went wrong-please try again",
+            response.data
+        )
+        self.assertIn(
+            b"Welcome to the GUDLFT Registration Portal!",
+            response.data
+        )
+        self.assertEqual(
+            self.club['points'],
+            self.initial_club_points
+        )
+        self.assertEqual(
+            self.competition['numberOfPlaces'],
+            self.initial_competition_places
+        )

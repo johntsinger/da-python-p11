@@ -78,7 +78,7 @@
 
      - Then go to http://localhost:8089
      - Set :
-       - number of users : 1 to 3
+       - number of users : 6
        - spawn rate : 1
        - host : this should be http://127.0.0.1:5000 if not check the address in the terminal where you are running the flask server
     - Click start swarming

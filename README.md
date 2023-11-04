@@ -56,11 +56,11 @@
 
        Note : a cover file already exists, but you can update it with this command.
 
-     - Get console report :
+     - Get report :
   
            coverage report
 
-     - Get html report :
+     - Get html format report :
 
            coverage html
 

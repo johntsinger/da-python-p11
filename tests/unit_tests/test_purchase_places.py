@@ -17,6 +17,23 @@ class TestPurchasePlaces(BaseTestCase):
         self.competition['places_booked'][self.club['name']] = 0
         self.club['points'] = self.initial_club_points
 
+    def test_competition_places_updated(self):
+        places_to_book = 5
+        data = {
+            'club': self.club['name'],
+            'competition': self.competition['name'],
+            'places': places_to_book
+        }
+        response = self.client.post(
+            self.url,
+            data=data
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.competition['numberOfPlaces'],
+            self.initial_competition_places - places_to_book
+        )
+
     def test_club_points_updated(self):
         places_to_book = 5
         data = {
